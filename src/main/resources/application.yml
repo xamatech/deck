@@ -1,0 +1,54 @@
+server.port: 8761
+
+spring:
+  main:
+    banner-mode: "off"
+  profiles.active: local #, security
+  security:
+    user:
+      name: ${SECURITY_USER:admin}
+      password: ${SECURITY_PASSWORD:pwd}
+
+management:
+    endpoints:
+      web:
+        base-path: /
+        exposure.include: "*"
+
+eureka:
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOST_NAME:localhost}
+  client:
+    enabled:  true
+    registerWithEureka: ${EUREKA_CLIENT_REGISTER_WITH_EUREKA:false}
+    fetchRegistry: ${EUREKA_CLIENT_FETCH_REGISTRY:false}
+    serviceUrl:
+      defaultZone: ${EUREKA_PEERS:http://admin:pwd@localhost:8761/eureka/}
+  server:
+    #enableSelfPreservation: false #TBD
+    #renewalPercentThreshold: 0.0  #TBD
+    waitTimeInMsWhenSyncEmpty: ${EUREKA_SERVER_WAIT_MS:0}
+    responseCacheUpdateInvervalMs: ${EUREKA_SERVER_RESPONSE_CACHE_TTL_MS:5000}
+
+ribbon.ServerListRefreshInterval: ${EUREKA_SERVER_LIST_REFRESH_MS:5000}
+
+api.ribbon.NIWSServerListClassName: com.xama.deck.EurekaRegistryBasedServerList
+
+zuul:
+  host:
+    connect-timeout-millis: ${ZUUL_CONNECT_TIMEOUT_MS:20000}
+    socket-timeout-millis: ${ZUUL_SOCKET_TIMEOUT_MS:20000}
+
+#  routes:
+#    auth-service:
+#      path: /uaa/** #path that will be intercepted
+#      url: auth-service #which url the request will e mapped to
+#      stripPrefix: false #if zuul should replace the "/uaa/" segment
+#      sensitiveHeaders:
+#
+#   dead-blind:
+#      path: /dead-blind/**
+#      url: dead-blind
+#      serviceId: dead-blind
+#      stripPrefix: true
+#      sensitiveHeaders:
