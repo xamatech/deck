@@ -1,6 +1,8 @@
 server.port: 8761
 
 spring:
+  application:
+    name: deck
   main:
     banner-mode: "off"
   profiles.active: local #, security
@@ -8,12 +10,36 @@ spring:
     user:
       name: ${SECURITY_USER:admin}
       password: ${SECURITY_PASSWORD:pwd}
+  jackson:
+    # Use REST API compliant property naming strategy by default
+    property-naming-strategy: SNAKE_CASE
+    # Only include properties that are not null
+    default-property-inclusion: non_null
+    deserialization:
+      # Very useful when doing currency stuff
+      use-big-decimal-for-floats: true
+    serialization:
+      # We don't want to have dates as timestamps
+      write-dates-as-timestamps: false
+    mapper:
+      # If you have JsonView enabled only properties that are actually annotated will be included
+      default-view-inclusion: false
+      # Just makes searching for a property easier :-)
+      sort-properties-alphabetically: true
+    # Use REST API compliant date formatting by default
+    date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
+    date-time-format:
+
+info:
+  name: ${spring.application.name}
 
 management:
     endpoints:
       web:
         base-path: /
         exposure.include: "*"
+        path-mapping:
+          health: /heartbeat
 
 eureka:
   instance:
@@ -35,6 +61,7 @@ ribbon.ServerListRefreshInterval: ${EUREKA_SERVER_LIST_REFRESH_MS:5000}
 api.ribbon.NIWSServerListClassName: com.xama.deck.EurekaRegistryBasedServerList
 
 zuul:
+  prefix: /services
   host:
     connect-timeout-millis: ${ZUUL_CONNECT_TIMEOUT_MS:20000}
     socket-timeout-millis: ${ZUUL_SOCKET_TIMEOUT_MS:20000}
