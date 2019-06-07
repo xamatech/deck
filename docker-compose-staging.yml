@@ -1,0 +1,9 @@
+version: '2'
+services:
+  dead-blind:
+    container_name: dead-blind
+    image: xamatech/deck:develop
+    ports:
+      - "8761:8761"
+    environment:
+      - ACTIVE_PROFILE=develop
