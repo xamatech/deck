@@ -1,0 +1,73 @@
+restore_workspace: &restore_workspace
+  attach_workspace:
+    at: .
+
+save_workspace: &save_workspace
+  persist_to_workspace:
+    root: .
+    paths:
+    - .
+
+version: 2
+
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+    - build:
+        filters:
+          tags:
+            only: /.*/
+    - test:
+        requires:
+        - build
+        filters:
+          tags:
+            only: /.*/
+    - deploy:
+        requires:
+        - build
+        - test
+        filters:
+          branches:
+            only:
+              - develop
+              - release
+              - production
+
+jobs:
+  build:
+    docker:
+    - image: circleci/openjdk:latest-node-browsers
+    steps:
+    - checkout
+    - run:
+        name: build application
+        command: make build
+    - *save_workspace
+
+  test:
+    docker:
+    - image: circleci/openjdk:latest-node-browsers
+    parallelism: 1
+    steps:
+    - checkout
+    - *restore_workspace
+    - run:
+        name: test application
+        command: make test
+
+  deploy:
+    docker:
+    - image: circleci/openjdk:latest-node-browsers
+    steps:
+    - checkout
+    - *restore_workspace
+    - setup_remote_docker:
+        docker_layer_caching: true
+    - run:
+        name: Build Docker Image
+        command: make docker_build
+    - run:
+        name: Deploy Docker Image
+        command: make docker_deploy
