@@ -11,7 +11,7 @@ internal class WebSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.csrf().ignoringAntMatchers("/eureka/**")
+        http.csrf().disable()
         super.configure(http)
     }
 }
@@ -23,8 +23,7 @@ internal class NoSecurityConfig : WebSecurityConfigurerAdapter() {
 
     @Throws(Exception::class)
     override fun configure(http: HttpSecurity) {
-        http.csrf().ignoringAntMatchers("/eureka/**")
-            .and()
+        http.csrf().disable()
             .authorizeRequests().anyRequest().permitAll()
     }
 }
